@@ -32,7 +32,15 @@ const script = js.outputFiles[0].text.replaceAll("</script", "<\\/script");
 const cssFile = path.join(out, ".preview.css");
 execFileSync(
   path.join(root, "node_modules/.bin/tailwindcss"),
-  ["-c", "preview/tailwind.config.ts", "-i", "src/app/globals.css", "-o", cssFile, "--minify"],
+  [
+    "-c",
+    "preview/tailwind.config.ts",
+    "-i",
+    "src/app/globals.css",
+    "-o",
+    cssFile,
+    "--minify",
+  ],
   { cwd: root, stdio: "inherit" },
 );
 const css = readFileSync(cssFile, "utf8");
@@ -53,14 +61,36 @@ for (const [name, [w, h]] of Object.entries(clips)) {
       `drawtext=fontfile=${font}:text='${name.toUpperCase()}':fontcolor=0xC9D1DC:fontsize=${Math.round(size / 2)}:x=(w-tw)/2:y=(h/2)+${size}`
     : "";
   execFileSync("ffmpeg", [
-    "-loglevel", "error", "-y",
-    "-f", "lavfi", "-i", `gradients=s=${w}x${h}:c0=0x0B1A3A:c1=0x1F7BFF:c2=0x050C1C:speed=0.04:d=4${text},format=yuv420p`,
-    "-f", "lavfi", "-i", "sine=frequency=220:sample_rate=44100:duration=4",
-    "-af", "volume=0.05",
-    "-t", "4", "-r", "24",
-    "-c:v", "libx264", "-crf", "30", "-preset", "veryfast",
-    "-c:a", "aac", "-b:a", "64k",
-    "-movflags", "+faststart", file,
+    "-loglevel",
+    "error",
+    "-y",
+    "-f",
+    "lavfi",
+    "-i",
+    `gradients=s=${w}x${h}:c0=0x0B1A3A:c1=0x1F7BFF:c2=0x050C1C:speed=0.04:d=4${text},format=yuv420p`,
+    "-f",
+    "lavfi",
+    "-i",
+    "sine=frequency=220:sample_rate=44100:duration=4",
+    "-af",
+    "volume=0.05",
+    "-t",
+    "4",
+    "-r",
+    "24",
+    "-c:v",
+    "libx264",
+    "-crf",
+    "30",
+    "-preset",
+    "veryfast",
+    "-c:a",
+    "aac",
+    "-b:a",
+    "64k",
+    "-movflags",
+    "+faststart",
+    file,
   ]);
 }
 
