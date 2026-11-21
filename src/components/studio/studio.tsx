@@ -61,15 +61,28 @@ type UploadState =
   | { kind: "ready"; preview: string; name: string; url: string }
   | { kind: "error"; preview?: string; message: string };
 
-export function Studio() {
+export type StudioProps = {
+  /** Shown above the top bar (used by the browser preview build). */
+  banner?: React.ReactNode;
+  /** Replace the server download route, e.g. in a sandboxed preview. */
+  onDownload?: (job: Job) => Promise<void> | void;
+  /** Hide the link to the timeline editor when it isn't available. */
+  showEditorLink?: boolean;
+};
+
+export function Studio({
+  banner,
+  onDownload,
+  showEditorLink = true,
+}: StudioProps = {}) {
   const { jobs, add, update, remove } = useJobs();
 
   const [mode, setMode] = useState<StudioMode>("text-to-video");
   const [modelId, setModelId] = useState("seedance-2-fast-t2v");
   const [prompt, setPrompt] = useState("");
-  const [format, setFormat] = useState<FormatId>("vertical");
-  const [duration, setDuration] = useState(5);
-  const [resolution, setResolution] = useState<Resolution | null>("720p");
+  const [formatChoice, setFormat] = useState<FormatId>("vertical");
+  const [durationChoice, setDuration] = useState(5);
+  const [resolutionChoice, setResolution] = useState<Resolution | null>("720p");
   const [upload, setUpload] = useState<UploadState>({ kind: "none" });
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -79,21 +92,18 @@ export function Studio() {
   const models = useMemo(() => modelsForMode(mode), [mode]);
   const model = getModel(modelId) ?? models[0];
   const formats = supportedFormats(model);
+  // Always render with settings the selected model supports, so the estimate
+  // never reflects an option carried over from the previous model.
+  const format = formats.includes(formatChoice) ? formatChoice : formats[0];
+  const duration = model.durations.includes(durationChoice)
+    ? durationChoice
+    : model.defaultDuration;
+  const resolution = model.resolutions
+    ? resolutionChoice && model.resolutions.includes(resolutionChoice)
+      ? resolutionChoice
+      : model.defaultResolution
+    : null;
   const estimate = estimateCost(model, duration, resolution);
-
-  // Keep options valid when the model changes.
-  useEffect(() => {
-    if (!formats.includes(format)) setFormat(formats[0]);
-    if (!model.durations.includes(duration)) setDuration(model.defaultDuration);
-    if (model.resolutions) {
-      if (!resolution || !model.resolutions.includes(resolution)) {
-        setResolution(model.defaultResolution);
-      }
-    } else if (resolution !== null) {
-      setResolution(null);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [model.id]);
 
   const switchMode = (next: StudioMode) => {
     if (next === mode) return;
@@ -195,6 +205,7 @@ export function Studio() {
 
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground lg:h-screen lg:overflow-hidden">
+      {banner}
       {/* Top bar */}
       <header className="flex items-center justify-between border-b border-border bg-background-dark/80 px-4 py-3 backdrop-blur">
         <Link href="/" aria-label="AIVA Motion Studio home">
@@ -211,13 +222,15 @@ export function Studio() {
               rendering
             </span>
           )}
-          <Link
-            href="/app"
-            className="ml-1 inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-muted-foreground transition hover:bg-accent hover:text-foreground"
-          >
-            <LayersIcon className="h-4 w-4" />
-            <span className="hidden sm:inline">Timeline editor</span>
-          </Link>
+          {showEditorLink && (
+            <Link
+              href="/app"
+              className="ml-1 inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-muted-foreground transition hover:bg-accent hover:text-foreground"
+            >
+              <LayersIcon className="h-4 w-4" />
+              <span className="hidden sm:inline">Timeline editor</span>
+            </Link>
+          )}
         </nav>
       </header>
 
@@ -420,7 +433,7 @@ export function Studio() {
         {/* Stage */}
         <main ref={stageRef} className="flex flex-1 flex-col lg:min-h-0">
           <div className="aiva-stage-bg flex min-h-[420px] flex-1 items-center justify-center p-6 lg:min-h-0">
-            <Stage job={selectedJob} />
+            <Stage job={selectedJob} onDownload={onDownload} />
           </div>
           <History
             jobs={jobs}
@@ -713,7 +726,13 @@ function frameStyle(job: Job): React.CSSProperties {
   return { aspectRatio: ratio };
 }
 
-function Stage({ job }: { job: Job | null }) {
+function Stage({
+  job,
+  onDownload,
+}: {
+  job: Job | null;
+  onDownload?: StudioProps["onDownload"];
+}) {
   const active = !!job && isActive(job);
   const now = useNow(active);
 
@@ -845,7 +864,18 @@ function Stage({ job }: { job: Job | null }) {
                 : ""}
             </p>
           </div>
-          {job.status === "completed" && job.videoUrl && (
+          {job.status === "completed" && job.videoUrl && onDownload && (
+            <button
+              type="button"
+              onClick={() => onDownload(job)}
+              className="inline-flex items-center gap-2 rounded-lg bg-white px-4 py-2 text-sm font-semibold text-[#0B1A3A] transition hover:bg-silver"
+              data-testid="download"
+            >
+              <DownloadIcon className="h-4 w-4" />
+              Download MP4
+            </button>
+          )}
+          {job.status === "completed" && job.videoUrl && !onDownload && (
             <a
               href={`/api/download?url=${encodeURIComponent(job.videoUrl)}&filename=${encodeURIComponent(`aiva-${job.id}.mp4`)}`}
               className="inline-flex items-center gap-2 rounded-lg bg-white px-4 py-2 text-sm font-semibold text-[#0B1A3A] transition hover:bg-silver"

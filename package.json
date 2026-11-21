@@ -10,7 +10,8 @@
     "format": "biome format --write",
     "prepare": "husky",
     "test": "vitest run",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "build:preview": "node preview/build.mjs"
   },
   "dependencies": {
     "@fal-ai/client": "^1.2.1",
