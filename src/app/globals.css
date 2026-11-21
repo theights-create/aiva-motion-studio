@@ -7,7 +7,7 @@ html {
 }
 
 body {
-  font-family: -apple-system, Arial, sans-serif;
+  font-family: var(--font-geist-sans), -apple-system, Arial, sans-serif;
 }
 
 @layer utilities {
@@ -46,33 +46,38 @@ body {
     --chart-5: 27 87% 67%;
     --radius: 0.3rem;
   }
+  /* AIVA System brand: deep navy, electric blue, white, silver */
   .dark {
-    --background: 0 0% 5.4%;
-    --background-dark: 0 0% 3.9%;
-    --background-light: 0 0% 8%;
-    --foreground: 0 0% 98%;
-    --card: 0 0% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 0 0% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 0 0% 9%;
-    --secondary: 0 0% 14.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 14.9%;
-    --muted-foreground: 0 0% 63.9%;
-    --accent: 0 0% 14.9%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 14.9%;
-    --input: 0 0% 14.9%;
-    --ring: 0 0% 83.1%;
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
+    --background: 223 62% 7%;
+    --background-dark: 224 66% 4.5%;
+    --background-light: 222 50% 10.5%;
+    --foreground: 0 0% 100%;
+    --card: 222 52% 9.5%;
+    --card-foreground: 0 0% 100%;
+    --popover: 222 52% 9.5%;
+    --popover-foreground: 0 0% 100%;
+    --primary: 214 100% 56%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 221 38% 16%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 221 36% 14%;
+    --muted-foreground: 216 18% 72%;
+    --accent: 220 42% 17%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 356 75% 52%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 220 34% 19%;
+    --input: 220 34% 19%;
+    --ring: 214 100% 56%;
+    --silver: 216 16% 80%;
+    --electric: 214 100% 56%;
+    --electric-glow: 200 100% 62%;
+    --navy: 223 62% 11%;
+    --chart-1: 214 100% 56%;
+    --chart-2: 200 100% 62%;
+    --chart-3: 216 16% 80%;
+    --chart-4: 230 60% 65%;
+    --chart-5: 190 80% 50%;
   }
 }
 
@@ -94,15 +99,39 @@ body {
 
 ::-webkit-scrollbar-track {
   --tw-bg-opacity: 1;
-  background-color: rgb(38 38 38 / var(--tw-bg-opacity));
+  background-color: rgb(13 24 48 / var(--tw-bg-opacity));
 }
 
 ::-webkit-scrollbar-thumb {
   --tw-bg-opacity: 1;
-  background-color: rgb(64 64 64 / var(--tw-bg-opacity));
+  background-color: rgb(40 60 100 / var(--tw-bg-opacity));
 }
 
 ::-webkit-scrollbar-thumb:hover {
   --tw-bg-opacity: 1;
-  background-color: rgb(82 82 82 / var(--tw-bg-opacity));
+  background-color: rgb(31 123 255 / var(--tw-bg-opacity));
+}
+
+/* Studio helpers */
+.aiva-silver-text {
+  background: linear-gradient(180deg, #ffffff 0%, #c9d1dc 55%, #8e9aab 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.aiva-stage-bg {
+  background:
+    radial-gradient(60% 50% at 50% 0%, hsl(var(--electric) / 0.16), transparent 70%),
+    radial-gradient(40% 40% at 80% 100%, hsl(var(--electric-glow) / 0.08), transparent 70%),
+    hsl(var(--background-dark));
+}
+@keyframes aiva-sweep {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(250%); }
+}
+.aiva-sweep {
+  animation: aiva-sweep 1.6s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .aiva-sweep { animation: none; }
 }

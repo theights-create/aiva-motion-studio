@@ -1,92 +1,72 @@
-# AI Video Starter Kit
+# AIVA Motion Studio
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![fal.ai](https://img.shields.io/badge/fal.ai-latest-purple)](https://fal.ai)
-[![Next.js](https://img.shields.io/badge/Next.js-14-black)](https://nextjs.org)
-[![Remotion](https://img.shields.io/badge/Remotion-latest-blue)](https://remotion.dev)
+AIVA System's AI video studio. Describe a scene or upload a reference image,
+pick a format, approve the estimated cost, then follow the render and preview
+and download the clip. Built on the
+[fal AI Video Starter Kit](https://github.com/fal-ai-community/video-starter-kit)
+(Next.js 14, fal.ai, Remotion).
 
-A powerful starter kit for building AI-powered video applications. Built with Next.js, Remotion, and fal.ai, this toolkit simplifies the complexities of working with AI video models in the browser.
+## What's inside
 
-![AI Video Starter Kit](https://github.com/fal-ai-community/video-starter-kit/blob/main/src/app/opengraph-image.png?raw=true)
+| Route | Purpose |
+|---|---|
+| `/` | **Motion Studio**: text-to-video and image-to-video |
+| `/app` | The starter kit's multi-track timeline editor |
 
-## Features
+### Models
 
-- 🎬 **Browser-Native Video Processing**: Seamless video handling and composition in the browser
-- 🤖 **AI Model Integration**: Direct access to state-of-the-art video models through fal.ai
-  - Minimax for video generation
-  - Hunyuan for visual synthesis
-  - LTX for video manipulation
-- 🎵 **Advanced Media Capabilities**:
-  - Multi-clip video composition
-  - Audio track integration
-  - Voiceover support
-  - Extended video duration handling
-- 🛠️ **Developer Utilities**:
-  - Metadata encoding
-  - Video processing pipeline
-  - Ready-to-use UI components
-  - TypeScript support
+These were chosen with the `fal-models-catalog` skill and checked against the
+live fal catalog with `genmedia` (status, input schema, pricing):
 
-## Tech Stack
+| Model | Text to video | Image to video | Formats | List price |
+|---|---|---|---|---|
+| Seedance 2.0 (premium) | `bytedance/seedance-2.0/text-to-video` | `…/image-to-video` | 9:16 · 1:1 · 16:9 (+ match image) | $0.014 / 1k tokens |
+| Seedance 2.0 Fast | `bytedance/seedance-2.0/fast/text-to-video` | `…/image-to-video` | 9:16 · 1:1 · 16:9 (+ match image) | $0.0112 / 1k tokens |
+| Kling V3 Pro | `fal-ai/kling-video/v3/pro/text-to-video` | `…/image-to-video` | T2V 9:16 · 1:1 · 16:9; I2V follows image | $0.14 / s |
+| Veo 3.1 Lite | `fal-ai/veo3.1/lite` | `fal-ai/veo3.1/lite/image-to-video` | 9:16 · 16:9 (+ match image) | $0.05 / s |
 
-- [fal.ai](https://fal.ai) - AI model infrastructure
-- [Next.js](https://nextjs.org) - React framework
-- [Remotion](https://remotion.dev) - Video processing
-- [IndexedDB](https://developer.mozilla.org/docs/Web/API/IndexedDB_API) - Browser-based storage (no cloud database required)
-- [Vercel](https://vercel.com) - Deployment platform
-- [UploadThing](https://uploadthing.com) - File upload
+The UI only offers a format, duration or resolution when that endpoint's schema
+supports it. Seedance is billed in tokens, so its estimate uses
+`width × height × 24fps × seconds ÷ 1024` and is marked "≈".
 
-## Quick Start
+All model definitions live in `src/lib/studio/models.ts`.
 
-1. Clone the repository:
+### Security
 
-```bash
-git clone https://github.com/fal-ai-community/video-starter-kit
-cd video-starter-kit
-```
+- `FAL_KEY` is read only on the server (`src/lib/studio/server.ts`). The
+  starter kit's browser key dialog has been removed.
+- The studio calls only its own routes: `/api/studio/upload`, `/generate` and
+  `/status`. `/generate` validates every option against the registry,
+  re-computes the cost, requires the client to send the approved amount, and
+  refuses anything over `MAX_CLIP_COST_USD`.
+- `/api/fal` (used by the timeline editor) forwards only to an allowlist of
+  endpoints the app ships with (`src/lib/studio/proxy-allowlist.ts`).
+- `/api/download` fetches only `fal.media` URLs, so it can't be used as an open proxy.
 
-2. Install dependencies:
+## Run locally
 
 ```bash
 npm install
-# or
-yarn install
-# or
-pnpm install
+cp .env.example .env.local   # then set FAL_KEY
+npm run dev                  # http://localhost:3000
 ```
 
-3. Set up your environment variables:
+## Test
 
 ```bash
-cp .env.example .env.local
+npm test            # unit tests: registry, cost math, validation, approval gate, allowlist
+npm run typecheck
+npm run build
 ```
 
-4. Start the development server:
+## Agent skills
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) to see the application.
-
-## Contributing
-
-We welcome contributions! See our [Contributing Guide](CONTRIBUTING.md) for more information.
-
-## Community
-
-- [Discord](https://discord.gg/fal-ai) - Join our community
-- [GitHub Discussions](https://github.com/fal-ai-community/video-starter-kit/discussions) - For questions and discussions
-- [Twitter](https://twitter.com/fal) - Follow us for updates
+`.claude/skills/` contains the fal `fal-models-catalog` and `genmedia` skills,
+installed with the
+[fal skills installer](https://github.com/fal-ai-community/skills/blob/main/docs/install.md).
+They use the [genmedia CLI](https://github.com/fal-ai-community/genmedia-cli)
+for model discovery, schemas and pricing.
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Deployment
-
-The easiest way to deploy your application is through [Vercel](https://vercel.com/new?utm_source=fal-ai&utm_medium=default-template&utm_campaign=video-starter-kit).
+MIT. The original starter kit is © fal.ai, see [LICENSE](LICENSE).
