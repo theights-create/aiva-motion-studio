@@ -9,10 +9,20 @@ vi.mock("@fal-ai/client", () => ({
 import { POST } from "@/app/api/studio/generate/route";
 
 function call(body: unknown) {
-  return POST(new Request("http://x/api/studio/generate", { method: "POST", body: JSON.stringify(body) }));
+  return POST(
+    new Request("http://x/api/studio/generate", {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
+  );
 }
 
-const valid = { modelId: "kling-v3-pro-t2v", prompt: "a city", format: "vertical", duration: 5 };
+const valid = {
+  modelId: "kling-v3-pro-t2v",
+  prompt: "a city",
+  format: "vertical",
+  duration: 5,
+};
 
 describe("POST /api/studio/generate", () => {
   beforeEach(() => {
@@ -32,10 +42,21 @@ describe("POST /api/studio/generate", () => {
   it("submits the validated input when approved", async () => {
     const res = await call({ ...valid, approvedCostUsd: 0.7 });
     expect(res.status).toBe(200);
-    expect(await res.json()).toMatchObject({ requestId: "req-1234567890", estimate: { usd: 0.7 } });
-    expect(submit).toHaveBeenCalledWith("fal-ai/kling-video/v3/pro/text-to-video", {
-      input: { prompt: "a city", aspect_ratio: "9:16", duration: "5", generate_audio: true },
+    expect(await res.json()).toMatchObject({
+      requestId: "req-1234567890",
+      estimate: { usd: 0.7 },
     });
+    expect(submit).toHaveBeenCalledWith(
+      "fal-ai/kling-video/v3/pro/text-to-video",
+      {
+        input: {
+          prompt: "a city",
+          aspect_ratio: "9:16",
+          duration: "5",
+          generate_audio: true,
+        },
+      },
+    );
   });
 
   it("enforces the per-clip cost ceiling", async () => {
@@ -46,7 +67,11 @@ describe("POST /api/studio/generate", () => {
   });
 
   it("rejects invalid requests before calling fal", async () => {
-    const res = await call({ ...valid, modelId: "fal-ai/flux/dev", approvedCostUsd: 99 });
+    const res = await call({
+      ...valid,
+      modelId: "fal-ai/flux/dev",
+      approvedCostUsd: 99,
+    });
     expect(res.status).toBe(400);
     expect(submit).not.toHaveBeenCalled();
   });

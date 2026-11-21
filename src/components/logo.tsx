@@ -8,7 +8,10 @@ export function LogoMark({ className = "h-7 w-7" }: { className?: string }) {
         </linearGradient>
       </defs>
       <rect width="32" height="32" rx="8" fill="#0B1A3A" />
-      <path d="M8 23 15 9h2l7 14h-3.2l-1.6-3.4h-6.4L11.2 23Z" fill="url(#aiva-mark)" />
+      <path
+        d="M8 23 15 9h2l7 14h-3.2l-1.6-3.4h-6.4L11.2 23Z"
+        fill="url(#aiva-mark)"
+      />
       <path d="M13.9 17h4.2L16 12.4Z" fill="#0B1A3A" />
       <circle cx="24" cy="9" r="2" fill="#C9D1DC" />
     </svg>

@@ -3,7 +3,12 @@
 import type { FormatId, Resolution, StudioMode } from "@/lib/studio/models";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-export type JobStatus = "submitting" | "queued" | "running" | "completed" | "failed";
+export type JobStatus =
+  | "submitting"
+  | "queued"
+  | "running"
+  | "completed"
+  | "failed";
 
 export type Job = {
   id: string;
@@ -49,7 +54,10 @@ function load(): Job[] {
 
 function save(jobs: Job[]) {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(jobs.slice(0, MAX_HISTORY)));
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify(jobs.slice(0, MAX_HISTORY)),
+    );
   } catch {
     // storage unavailable (private mode); history just won't persist
   }
@@ -104,12 +112,21 @@ export function useJobs() {
             if (cancelled) return;
             if (!res.ok) {
               // transient server/network error: keep polling, surface message
-              update(j.id, { logs: [...j.logs.slice(-6), data.error ?? "Status check failed"] });
+              update(j.id, {
+                logs: [
+                  ...j.logs.slice(-6),
+                  data.error ?? "Status check failed",
+                ],
+              });
               return;
             }
             const logs: string[] = data.logs?.length ? data.logs : j.logs;
             if (data.status === "queued") {
-              update(j.id, { status: "queued", queuePosition: data.queuePosition, logs });
+              update(j.id, {
+                status: "queued",
+                queuePosition: data.queuePosition,
+                logs,
+              });
             } else if (data.status === "running") {
               update(j.id, {
                 status: "running",

@@ -28,7 +28,9 @@ export async function POST(req: Request) {
   if (!result.ok) return jsonError(result.error, 400);
   const { model, input, estimate } = result;
 
-  const approved = Number((body as { approvedCostUsd?: unknown }).approvedCostUsd);
+  const approved = Number(
+    (body as { approvedCostUsd?: unknown }).approvedCostUsd,
+  );
   if (!Number.isFinite(approved) || approved + 1e-9 < estimate.usd) {
     return jsonError(
       `Cost approval required: estimated $${estimate.usd.toFixed(2)}`,

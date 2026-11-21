@@ -12,7 +12,8 @@ export async function GET(req: NextRequest) {
   const requestId = req.nextUrl.searchParams.get("requestId") ?? "";
   const model = getModel(modelId);
   if (!model) return jsonError("Unknown model", 400);
-  if (!/^[A-Za-z0-9-]{8,64}$/.test(requestId)) return jsonError("Invalid request id", 400);
+  if (!/^[A-Za-z0-9-]{8,64}$/.test(requestId))
+    return jsonError("Invalid request id", 400);
 
   try {
     const fal = getFal();
@@ -23,11 +24,18 @@ export async function GET(req: NextRequest) {
 
     const logs =
       "logs" in status && Array.isArray(status.logs)
-        ? status.logs.map((l) => l.message).filter(Boolean).slice(-8)
+        ? status.logs
+            .map((l) => l.message)
+            .filter(Boolean)
+            .slice(-8)
         : [];
 
     if (status.status === "IN_QUEUE") {
-      return Response.json({ status: "queued", queuePosition: status.queue_position, logs });
+      return Response.json({
+        status: "queued",
+        queuePosition: status.queue_position,
+        logs,
+      });
     }
     if (status.status === "IN_PROGRESS") {
       return Response.json({ status: "running", logs });
@@ -37,10 +45,19 @@ export async function GET(req: NextRequest) {
     try {
       const result = await fal.queue.result(model.endpointId, { requestId });
       const url = (result.data as VideoResult)?.video?.url;
-      if (!url) return Response.json({ status: "failed", error: "No video returned", logs });
+      if (!url)
+        return Response.json({
+          status: "failed",
+          error: "No video returned",
+          logs,
+        });
       return Response.json({ status: "completed", videoUrl: url, logs });
     } catch (err) {
-      return Response.json({ status: "failed", error: falErrorMessage(err), logs });
+      return Response.json({
+        status: "failed",
+        error: falErrorMessage(err),
+        logs,
+      });
     }
   } catch (err) {
     console.error("[studio/status]", err);

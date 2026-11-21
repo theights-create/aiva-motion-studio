@@ -11,7 +11,9 @@ export const GET = async (req: NextRequest) => {
     return new Response("Missing 'url' query parameter", { status: 400 });
   }
   if (!isFalMediaUrl(url)) {
-    return new Response("Only fal.media URLs can be downloaded", { status: 400 });
+    return new Response("Only fal.media URLs can be downloaded", {
+      status: 400,
+    });
   }
 
   const upstream = await fetch(url);

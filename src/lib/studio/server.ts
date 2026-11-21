@@ -31,7 +31,11 @@ export function jsonError(message: string, status: number) {
 
 export function falErrorMessage(err: unknown): string {
   if (err instanceof MissingKeyError) return err.message;
-  const e = err as { status?: number; body?: { detail?: unknown }; message?: string };
+  const e = err as {
+    status?: number;
+    body?: { detail?: unknown };
+    message?: string;
+  };
   const detail = e?.body?.detail;
   if (Array.isArray(detail)) {
     return detail

@@ -5,7 +5,8 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "AIVA Motion Studio",
-  description: "AI video studio by AIVA System. Text and image to video, in every format.",
+  description:
+    "AI video studio by AIVA System. Text and image to video, in every format.",
 };
 
 export default function RootLayout({

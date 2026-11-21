@@ -19,10 +19,28 @@ export const FORMATS: Record<
   FormatId,
   { label: string; ratio: string; hint: string; w: number; h: number }
 > = {
-  vertical: { label: "Vertical", ratio: "9:16", hint: "Reels · TikTok · Shorts", w: 9, h: 16 },
+  vertical: {
+    label: "Vertical",
+    ratio: "9:16",
+    hint: "Reels · TikTok · Shorts",
+    w: 9,
+    h: 16,
+  },
   square: { label: "Square", ratio: "1:1", hint: "Feed · Ads", w: 1, h: 1 },
-  landscape: { label: "Landscape", ratio: "16:9", hint: "YouTube · Web · TV", w: 16, h: 9 },
-  match: { label: "Match image", ratio: "auto", hint: "Keeps your image framing", w: 4, h: 3 },
+  landscape: {
+    label: "Landscape",
+    ratio: "16:9",
+    hint: "YouTube · Web · TV",
+    w: 16,
+    h: 9,
+  },
+  match: {
+    label: "Match image",
+    ratio: "auto",
+    hint: "Keeps your image framing",
+    w: 4,
+    h: 3,
+  },
 };
 
 export type Resolution = "480p" | "720p" | "1080p";
@@ -66,12 +84,13 @@ const SEEDANCE_AREA: Record<Resolution, number> = {
   "1080p": 1920 * 1080,
 };
 
-const ASPECT_ALL = { vertical: "9:16", square: "1:1", landscape: "16:9" } as const;
+const ASPECT_ALL = {
+  vertical: "9:16",
+  square: "1:1",
+  landscape: "16:9",
+} as const;
 
-function seedance(
-  mode: StudioMode,
-  fast: boolean,
-): StudioModel {
+function seedance(mode: StudioMode, fast: boolean): StudioModel {
   const base = fast ? "bytedance/seedance-2.0/fast" : "bytedance/seedance-2.0";
   return {
     id: `seedance-2${fast ? "-fast" : ""}-${mode === "text-to-video" ? "t2v" : "i2v"}`,
@@ -205,7 +224,11 @@ export const STUDIO_MODELS: StudioModel[] = [
       prompt: p.prompt,
       image_url: p.imageUrl,
       aspect_ratio:
-        p.format === "vertical" ? "9:16" : p.format === "landscape" ? "16:9" : "auto",
+        p.format === "vertical"
+          ? "9:16"
+          : p.format === "landscape"
+            ? "16:9"
+            : "auto",
       duration: `${p.duration}s`,
       resolution: p.resolution,
       generate_audio: true,
@@ -261,21 +284,29 @@ function round2(n: number) {
 }
 
 export type ValidationResult =
-  | { ok: true; model: StudioModel; params: GenerationParams; input: Record<string, unknown>; estimate: CostEstimate }
+  | {
+      ok: true;
+      model: StudioModel;
+      params: GenerationParams;
+      input: Record<string, unknown>;
+      estimate: CostEstimate;
+    }
   | { ok: false; error: string };
 
 export const MAX_PROMPT_LENGTH = 2000;
 
 /** Validate a request against the registry. Used by the server before any paid call. */
 export function validateRequest(body: unknown): ValidationResult {
-  if (!body || typeof body !== "object") return { ok: false, error: "Invalid body" };
+  if (!body || typeof body !== "object")
+    return { ok: false, error: "Invalid body" };
   const b = body as Record<string, unknown>;
   const model = typeof b.modelId === "string" ? getModel(b.modelId) : undefined;
   if (!model) return { ok: false, error: "Unknown model" };
 
   const prompt = typeof b.prompt === "string" ? b.prompt.trim() : "";
   if (!prompt) return { ok: false, error: "Describe the scene first" };
-  if (prompt.length > MAX_PROMPT_LENGTH) return { ok: false, error: "Prompt is too long" };
+  if (prompt.length > MAX_PROMPT_LENGTH)
+    return { ok: false, error: "Prompt is too long" };
 
   const format = b.format as FormatId;
   if (!supportedFormats(model).includes(format)) {
@@ -283,13 +314,19 @@ export function validateRequest(body: unknown): ValidationResult {
   }
   const duration = Number(b.duration);
   if (!model.durations.includes(duration)) {
-    return { ok: false, error: `${model.label} does not support ${b.duration}s` };
+    return {
+      ok: false,
+      error: `${model.label} does not support ${b.duration}s`,
+    };
   }
   let resolution: Resolution | null = null;
   if (model.resolutions) {
     resolution = b.resolution as Resolution;
     if (!model.resolutions.includes(resolution)) {
-      return { ok: false, error: `${model.label} does not support that resolution` };
+      return {
+        ok: false,
+        error: `${model.label} does not support that resolution`,
+      };
     }
   }
 
@@ -301,7 +338,13 @@ export function validateRequest(body: unknown): ValidationResult {
     imageUrl = b.imageUrl;
   }
 
-  const params: GenerationParams = { prompt, imageUrl, format, duration, resolution };
+  const params: GenerationParams = {
+    prompt,
+    imageUrl,
+    format,
+    duration,
+    resolution,
+  };
   return {
     ok: true,
     model,

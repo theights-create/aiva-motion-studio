@@ -18,7 +18,8 @@ export async function POST(req: Request) {
   if (!ALLOWED_TYPES.includes(file.type)) {
     return jsonError("Use a JPG, PNG or WebP image", 415);
   }
-  if (file.size > MAX_BYTES) return jsonError("Image must be 10 MB or smaller", 413);
+  if (file.size > MAX_BYTES)
+    return jsonError("Image must be 10 MB or smaller", 413);
 
   try {
     const fal = getFal();

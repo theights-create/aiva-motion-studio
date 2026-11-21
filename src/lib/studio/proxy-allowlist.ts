@@ -46,4 +46,3 @@ export function isAllowedTarget(target: string | null): boolean {
   }
   return false;
 }
-

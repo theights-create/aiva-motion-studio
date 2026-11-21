@@ -98,9 +98,7 @@ export function Studio() {
   const switchMode = (next: StudioMode) => {
     if (next === mode) return;
     setMode(next);
-    const sameFamily = modelsForMode(next).find(
-      (m) => m.label === model.label,
-    );
+    const sameFamily = modelsForMode(next).find((m) => m.label === model.label);
     setModelId((sameFamily ?? modelsForMode(next)[0]).id);
   };
 
@@ -109,8 +107,7 @@ export function Studio() {
 
   const needsImage = mode === "image-to-video";
   const imageReady = upload.kind === "ready";
-  const canGenerate =
-    prompt.trim().length > 0 && (!needsImage || imageReady);
+  const canGenerate = prompt.trim().length > 0 && (!needsImage || imageReady);
 
   async function handleFile(file: File) {
     setSubmitError(null);
@@ -187,7 +184,8 @@ export function Studio() {
         status: "queued",
       });
     } catch (e) {
-      const message = e instanceof Error ? e.message : "Could not start generation";
+      const message =
+        e instanceof Error ? e.message : "Could not start generation";
       update(id, { status: "failed", error: message, finishedAt: Date.now() });
       setSubmitError(message);
     }
@@ -204,11 +202,13 @@ export function Studio() {
         </Link>
         <nav className="flex items-center gap-1 text-sm">
           <span className="hidden items-center gap-1.5 rounded-full border border-border px-3 py-1 text-xs text-muted-foreground sm:inline-flex">
-            <LockIcon className="h-3 w-3 text-electric" /> API key secured server-side
+            <LockIcon className="h-3 w-3 text-electric" /> API key secured
+            server-side
           </span>
           {activeCount > 0 && (
             <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/15 px-3 py-1 text-xs text-electric">
-              <Loader2Icon className="h-3 w-3 animate-spin" /> {activeCount} rendering
+              <Loader2Icon className="h-3 w-3 animate-spin" /> {activeCount}{" "}
+              rendering
             </span>
           )}
           <Link
@@ -258,7 +258,11 @@ export function Studio() {
             {/* Reference image */}
             {needsImage && (
               <Section label="Reference image" hint="Becomes the first frame">
-                <ImageDrop upload={upload} onFile={handleFile} onClear={() => setUpload({ kind: "none" })} />
+                <ImageDrop
+                  upload={upload}
+                  onFile={handleFile}
+                  onClear={() => setUpload({ kind: "none" })}
+                />
               </Section>
             )}
 
@@ -308,7 +312,11 @@ export function Studio() {
                         disabled={!supported}
                         onClick={() => setFormat(f)}
                         aria-pressed={format === f}
-                        title={supported ? FORMATS[f].hint : `${model.label} doesn't support ${FORMATS[f].label.toLowerCase()}`}
+                        title={
+                          supported
+                            ? FORMATS[f].hint
+                            : `${model.label} doesn't support ${FORMATS[f].label.toLowerCase()}`
+                        }
                         className={cn(
                           "flex items-center gap-3 rounded-lg border px-3 py-2.5 text-left transition",
                           format === f && supported
@@ -317,11 +325,20 @@ export function Studio() {
                           !supported && "cursor-not-allowed opacity-35",
                         )}
                       >
-                        <FormatGlyph id={f} active={format === f && supported} />
+                        <FormatGlyph
+                          id={f}
+                          active={format === f && supported}
+                        />
                         <span className="min-w-0">
-                          <span className="block text-sm font-medium">{FORMATS[f].label}</span>
+                          <span className="block text-sm font-medium">
+                            {FORMATS[f].label}
+                          </span>
                           <span className="block truncate text-[11px] text-muted-foreground">
-                            {supported ? (f === "match" ? "Auto" : FORMATS[f].ratio) : "Not supported"}
+                            {supported
+                              ? f === "match"
+                                ? "Auto"
+                                : FORMATS[f].ratio
+                              : "Not supported"}
                           </span>
                         </span>
                       </button>
@@ -333,7 +350,10 @@ export function Studio() {
             {/* Duration + resolution */}
             <Section label="Clip length">
               <Chips
-                options={model.durations.map((d) => ({ value: String(d), label: `${d}s` }))}
+                options={model.durations.map((d) => ({
+                  value: String(d),
+                  label: `${d}s`,
+                }))}
                 value={String(duration)}
                 onChange={(v) => setDuration(Number(v))}
               />
@@ -341,7 +361,10 @@ export function Studio() {
             {model.resolutions && (
               <Section label="Resolution">
                 <Chips
-                  options={model.resolutions.map((r) => ({ value: r, label: r }))}
+                  options={model.resolutions.map((r) => ({
+                    value: r,
+                    label: r,
+                  }))}
                   value={resolution ?? ""}
                   onChange={(v) => setResolution(v as Resolution)}
                 />
@@ -356,7 +379,10 @@ export function Studio() {
                 <div className="text-xs uppercase tracking-wider text-muted-foreground">
                   Estimated cost
                 </div>
-                <div className="text-2xl font-semibold tabular-nums" data-testid="estimate">
+                <div
+                  className="text-2xl font-semibold tabular-nums"
+                  data-testid="estimate"
+                >
                   {estimate.approximate ? "≈ " : ""}${estimate.usd.toFixed(2)}
                 </div>
               </div>
@@ -433,8 +459,12 @@ function Section({
   return (
     <section>
       <div className="mb-2 flex items-baseline justify-between">
-        <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-silver">{label}</h2>
-        {hint && <span className="text-[11px] text-muted-foreground">{hint}</span>}
+        <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-silver">
+          {label}
+        </h2>
+        {hint && (
+          <span className="text-[11px] text-muted-foreground">{hint}</span>
+        )}
       </div>
       {children}
     </section>
@@ -480,7 +510,11 @@ function ModelCard({
   selected: boolean;
   onSelect: () => void;
 }) {
-  const from = estimateCost(model, model.defaultDuration, model.defaultResolution);
+  const from = estimateCost(
+    model,
+    model.defaultDuration,
+    model.defaultResolution,
+  );
   const formatLabels = supportedFormats(model)
     .map((f) => (f === "match" ? "Match" : FORMATS[f].ratio))
     .join(" · ");
@@ -519,9 +553,12 @@ function ModelCard({
             {model.tier}
           </span>
         </span>
-        <span className="block text-xs text-muted-foreground">{model.tagline}</span>
+        <span className="block text-xs text-muted-foreground">
+          {model.tagline}
+        </span>
         <span className="mt-1 block text-[11px] text-muted-foreground/80">
-          {model.family} · {formatLabels} · from {from.approximate ? "≈" : ""}${from.usd.toFixed(2)}
+          {model.family} · {formatLabels} · from {from.approximate ? "≈" : ""}$
+          {from.usd.toFixed(2)}
         </span>
       </span>
     </button>
@@ -575,12 +612,22 @@ function ImageDrop({
       {preview ? (
         <div className="relative overflow-hidden rounded-lg border border-border bg-background-dark">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={preview} alt="Reference" className="max-h-48 w-full object-contain" />
+          <img
+            src={preview}
+            alt="Reference"
+            className="max-h-48 w-full object-contain"
+          />
           <div className="flex items-center justify-between gap-2 border-t border-border px-3 py-2 text-xs">
             <span className="flex min-w-0 items-center gap-1.5 text-muted-foreground">
-              {upload.kind === "uploading" && <Loader2Icon className="h-3 w-3 animate-spin text-electric" />}
-              {upload.kind === "ready" && <CheckIcon className="h-3 w-3 text-electric" />}
-              {upload.kind === "error" && <AlertTriangleIcon className="h-3 w-3 text-red-300" />}
+              {upload.kind === "uploading" && (
+                <Loader2Icon className="h-3 w-3 animate-spin text-electric" />
+              )}
+              {upload.kind === "ready" && (
+                <CheckIcon className="h-3 w-3 text-electric" />
+              )}
+              {upload.kind === "error" && (
+                <AlertTriangleIcon className="h-3 w-3 text-red-300" />
+              )}
               <span className="truncate">
                 {upload.kind === "uploading"
                   ? "Uploading…"
@@ -592,10 +639,17 @@ function ImageDrop({
               </span>
             </span>
             <span className="flex shrink-0 gap-1">
-              <button onClick={() => inputRef.current?.click()} className="rounded px-2 py-1 hover:bg-accent">
+              <button
+                onClick={() => inputRef.current?.click()}
+                className="rounded px-2 py-1 hover:bg-accent"
+              >
                 Replace
               </button>
-              <button onClick={onClear} aria-label="Remove image" className="rounded p-1 hover:bg-accent">
+              <button
+                onClick={onClear}
+                aria-label="Remove image"
+                className="rounded p-1 hover:bg-accent"
+              >
                 <XIcon className="h-3.5 w-3.5" />
               </button>
             </span>
@@ -617,12 +671,18 @@ function ImageDrop({
           }}
           className={cn(
             "flex w-full flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed px-4 py-8 text-center transition",
-            drag ? "border-primary bg-primary/10" : "border-border hover:border-silver/40",
+            drag
+              ? "border-primary bg-primary/10"
+              : "border-border hover:border-silver/40",
           )}
         >
           <ImagePlusIcon className="h-6 w-6 text-electric" />
-          <span className="text-sm font-medium">Drop an image or click to upload</span>
-          <span className="text-xs text-muted-foreground">JPG, PNG or WebP · up to 10 MB</span>
+          <span className="text-sm font-medium">
+            Drop an image or click to upload
+          </span>
+          <span className="text-xs text-muted-foreground">
+            JPG, PNG or WebP · up to 10 MB
+          </span>
           {upload.kind === "error" && (
             <span className="text-xs text-red-300">{upload.message}</span>
           )}
@@ -668,8 +728,8 @@ function Stage({ job }: { job: Job | null }) {
         </h1>
         <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
           Describe a scene or upload a reference frame, pick a format, and AIVA
-          Motion Studio renders a short clip. You approve the cost before anything
-          is generated.
+          Motion Studio renders a short clip. You approve the cost before
+          anything is generated.
         </p>
       </div>
     );
@@ -695,7 +755,11 @@ function Stage({ job }: { job: Job | null }) {
         style={
           job.status === "completed" && isMatch
             ? { maxWidth: "100%" }
-            : { ...frameStyle(job), height: "min(62vh, 640px)", maxWidth: "100%" }
+            : {
+                ...frameStyle(job),
+                height: "min(62vh, 640px)",
+                maxWidth: "100%",
+              }
         }
         data-testid="stage-frame"
       >
@@ -715,7 +779,9 @@ function Stage({ job }: { job: Job | null }) {
           <div className="flex h-full min-h-[240px] flex-col items-center justify-center gap-3 p-8 text-center">
             <AlertTriangleIcon className="h-8 w-8 text-red-300" />
             <div className="text-sm font-medium">Generation failed</div>
-            <p className="max-w-sm text-xs text-muted-foreground">{job.error}</p>
+            <p className="max-w-sm text-xs text-muted-foreground">
+              {job.error}
+            </p>
           </div>
         ) : (
           <div className="relative flex h-full min-h-[240px] flex-col items-center justify-center gap-4 p-8 text-center">
@@ -740,7 +806,8 @@ function Stage({ job }: { job: Job | null }) {
             </div>
             {job.status === "running" && (
               <div className="relative text-xs tabular-nums text-muted-foreground">
-                {fmtElapsed(runningFor)} elapsed · typically ~{Math.round(typical / 60) || 1} min
+                {fmtElapsed(runningFor)} elapsed · typically ~
+                {Math.round(typical / 60) || 1} min
               </div>
             )}
           </div>
@@ -771,7 +838,8 @@ function Stage({ job }: { job: Job | null }) {
             <p className="line-clamp-2 text-sm">{job.prompt}</p>
             <p className="mt-1 text-xs text-muted-foreground">
               {job.modelLabel} · {FORMATS[job.format].label} · {job.duration}s
-              {job.resolution ? ` · ${job.resolution}` : ""} · est. ${job.estimateUsd.toFixed(2)}
+              {job.resolution ? ` · ${job.resolution}` : ""} · est. $
+              {job.estimateUsd.toFixed(2)}
               {job.finishedAt && job.status === "completed"
                 ? ` · ready in ${fmtElapsed(job.finishedAt - job.createdAt)}`
                 : ""}
@@ -808,13 +876,21 @@ function Steps({ status }: { status: Job["status"] }) {
           key={s.key}
           className={cn(
             "flex items-center gap-1.5",
-            i < idx ? "text-silver" : i === idx ? "text-electric" : "text-muted-foreground/50",
+            i < idx
+              ? "text-silver"
+              : i === idx
+                ? "text-electric"
+                : "text-muted-foreground/50",
           )}
         >
           <span
             className={cn(
               "h-1.5 w-1.5 rounded-full",
-              i < idx ? "bg-silver" : i === idx ? "bg-electric" : "bg-muted-foreground/40",
+              i < idx
+                ? "bg-silver"
+                : i === idx
+                  ? "bg-electric"
+                  : "bg-muted-foreground/40",
             )}
           />
           {s.label}
@@ -839,8 +915,12 @@ function History({
   return (
     <div className="border-t border-border bg-background-light px-4 py-3">
       <div className="mb-2 flex items-center justify-between">
-        <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-silver">Your clips</h2>
-        <span className="text-[11px] text-muted-foreground">Saved in this browser</span>
+        <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-silver">
+          Your clips
+        </h2>
+        <span className="text-[11px] text-muted-foreground">
+          Saved in this browser
+        </span>
       </div>
       <div className="flex gap-3 overflow-x-auto pb-1">
         {jobs.map((j) => {
@@ -851,13 +931,23 @@ function History({
                 onClick={() => onSelect(j.id)}
                 className={cn(
                   "relative flex h-24 items-center justify-center overflow-hidden rounded-lg border bg-background-dark transition",
-                  j.id === selectedId ? "border-primary ring-2 ring-primary/40" : "border-border hover:border-silver/40",
+                  j.id === selectedId
+                    ? "border-primary ring-2 ring-primary/40"
+                    : "border-border hover:border-silver/40",
                 )}
-                style={{ aspectRatio: j.format === "match" ? "4 / 3" : `${f.w} / ${f.h}` }}
+                style={{
+                  aspectRatio:
+                    j.format === "match" ? "4 / 3" : `${f.w} / ${f.h}`,
+                }}
                 title={j.prompt}
               >
                 {j.status === "completed" && j.videoUrl ? (
-                  <video src={`${j.videoUrl}#t=0.5`} muted preload="metadata" className="h-full w-full object-cover" />
+                  <video
+                    src={`${j.videoUrl}#t=0.5`}
+                    muted
+                    preload="metadata"
+                    className="h-full w-full object-cover"
+                  />
                 ) : j.status === "failed" ? (
                   <AlertTriangleIcon className="h-5 w-5 text-red-300" />
                 ) : (
@@ -907,7 +997,10 @@ function ConfirmDialog({
   const rows: [string, string][] = [
     ["Model", `${model.label} (${model.family})`],
     ["Endpoint", model.endpointId],
-    ["Format", `${FORMATS[format].label}${format === "match" ? "" : ` · ${FORMATS[format].ratio}`}`],
+    [
+      "Format",
+      `${FORMATS[format].label}${format === "match" ? "" : ` · ${FORMATS[format].ratio}`}`,
+    ],
     ["Clip length", `${duration} seconds`],
     ...(resolution ? ([["Resolution", resolution]] as [string, string][]) : []),
     ["Pricing", estimate.breakdown],
@@ -930,14 +1023,18 @@ function ConfirmDialog({
           ))}
           <div className="flex items-center justify-between gap-4 bg-primary/10 px-3 py-3">
             <dt className="font-medium">Estimated cost</dt>
-            <dd className="text-xl font-semibold tabular-nums text-electric" data-testid="confirm-cost">
+            <dd
+              className="text-xl font-semibold tabular-nums text-electric"
+              data-testid="confirm-cost"
+            >
               {estimate.approximate ? "≈ " : ""}${estimate.usd.toFixed(2)}
             </dd>
           </div>
         </dl>
         {estimate.approximate && (
           <p className="text-xs text-muted-foreground">
-            Token-priced model: the final charge depends on the exact output size fal reports.
+            Token-priced model: the final charge depends on the exact output
+            size fal reports.
           </p>
         )}
         <DialogFooter className="gap-2 sm:gap-0">
